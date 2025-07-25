@@ -16,7 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        shell: bash        working-directory: .
+        shell: bash
+        working-directory: .
     steps:
       - name: Git checkout
         uses: actions/checkout@v3
