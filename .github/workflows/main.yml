@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - KasteM34-PR-1
   pull_request:
 
 permissions:
@@ -41,24 +42,23 @@ jobs:
 
       - name: Terraform fmt check
         id: fmt
-        run: terraform -chdir=workflows fmt -check
+        run: terraform fmt -check
         continue-on-error: true
 
       - name: Terraform Init
         id: init
-        run: |
-          terraform -chdir=workflows init \
-            -backend-config="bucket=${{ secrets.AWS_BUCKET_NAME }}" \
-            -backend-config="key=${{ secrets.AWS_BUCKET_KEY_NAME }}" \
-            -backend-config="region=${{ secrets.AWS_REGION }}"
+        run: terraform init \
+          -backend-config="bucket=${{ secrets.AWS_BUCKET_NAME }}" \
+          -backend-config="key=${{ secrets.AWS_BUCKET_KEY_NAME }}" \
+          -backend-config="region=${{ secrets.AWS_REGION }}"
 
       - name: Terraform Validate
         id: validate
-        run: terraform -chdir=workflows validate -no-color
+        run: terraform validate -no-color
 
       - name: Terraform Plan
         id: plan
-        run: terraform -chdir=workflows plan -no-color
+        run: terraform plan -no-color
         if: github.event_name == 'pull_request'
         continue-on-error: true
 
@@ -105,4 +105,4 @@ jobs:
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform -chdir=workflows apply -auto-approve -input=false
+        run: terraform apply -auto-approve -input=false
