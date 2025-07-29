@@ -41,26 +41,24 @@ jobs:
 
       - name: Terraform fmt check
         id: fmt
-        run: terraform fmt -check
+        run: terraform -chdir=workflows fmt -check
         continue-on-error: true
-
-      - name: Debug AWS_BUCKET_NAME
-        run: echo "AWS_BUCKET_NAME is '${{ secrets.AWS_BUCKET_NAME }}'"
 
       - name: Terraform Init
         id: init
-        run: terraform init \
-          -backend-config="bucket=${{ secrets.AWS_BUCKET_NAME }}" \
-          -backend-config="key=${{ secrets.AWS_BUCKET_KEY_NAME }}" \
-          -backend-config="region=${{ secrets.AWS_REGION }}"
+        run: |
+          terraform -chdir=workflows init \
+            -backend-config="bucket=${{ secrets.AWS_BUCKET_NAME }}" \
+            -backend-config="key=${{ secrets.AWS_BUCKET_KEY_NAME }}" \
+            -backend-config="region=${{ secrets.AWS_REGION }}"
 
       - name: Terraform Validate
         id: validate
-        run: terraform validate -no-color
+        run: terraform -chdir=workflows validate -no-color
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color
+        run: terraform -chdir=workflows plan -no-color
         if: github.event_name == 'pull_request'
         continue-on-error: true
 
@@ -107,7 +105,4 @@ jobs:
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
-
-
-
+        run: terraform -chdir=workflows apply -auto-approve -input=false
